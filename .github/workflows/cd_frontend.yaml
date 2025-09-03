@@ -7,6 +7,7 @@ on:
 env:
   IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/frontend
   NAMESPACE: default
+  KUBECONFIG: /etc/kubernetes/admin.conf   # ← لا نحتاج secret
 
 jobs:
   build-and-deploy:
@@ -19,7 +20,7 @@ jobs:
       - name: Docker login
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}   # أو PASSWORD إن كنت استخدمته
         run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
       - name: Build & Push image
@@ -29,19 +30,11 @@ jobs:
           docker push $IMAGE_REPO:$TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
 
-      # إذا لم يكن kubeconfig مضبوطًا على الـrunner، فعّل هذا البلوك واضف Secret اسمه KUBECONFIG
-      - name: (Optional) Write kubeconfig from secret
-        if: ${{ secrets.KUBECONFIG != '' }}
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
-
-      - name: Apply manifests (create/update)
-        run: |
-          kubectl -n $NAMESPACE apply -f k8s/frontend.yaml
+      - name: Apply manifests
+        run: kubectl -n $NAMESPACE apply -f k8s/frontend.yaml
 
       - name: Update image & rollout
         run: |
           kubectl -n $NAMESPACE set image deploy/frontend web=$IMAGE_REPO:${TAG}
           kubectl -n $NAMESPACE rollout status deploy/frontend
+x`
