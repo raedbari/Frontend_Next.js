@@ -1,5 +1,5 @@
-
-/* Custom design tokens & styles */
+/* 
+/* 
 :root {
   --bg: #0b1020;
   --text: #e8edf8;
@@ -96,4 +96,25 @@ body {
   box-shadow: 0 0 0 2px rgba(138,125,255,0.25);
 }
 
-label { display: block; margin: 0 0 6px 2px; color: var(--muted); font-size: 13px; }
+label { display: block; margin: 0 0 6px 2px; color: var(--muted); font-size: 13px; } */
+
+
+/* Design tokens */
+:root {
+  --bg: #0b0b10;
+  --fg: #e5e7eb;
+  --accent-1: #35d6ff;
+  --accent-2: #8a74ff;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--fg);
+  background-color: var(--bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  line-height: 1.45;
+  /* إن أردت الخلفيات لاحقًا أضفها، لكن اختم بسيمي-كولون وأغلق القوس */
+}
