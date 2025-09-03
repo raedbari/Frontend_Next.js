@@ -37,4 +37,3 @@ jobs:
         run: |
           kubectl -n $NAMESPACE set image deploy/frontend web=$IMAGE_REPO:${TAG}
           kubectl -n $NAMESPACE rollout status deploy/frontend
-x`
