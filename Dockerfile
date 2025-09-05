@@ -1,19 +1,26 @@
-# 1) Build
-FROM node:20-bookworm-slim AS build
+# ===== Build =====
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY package*.json ./
 RUN npm ci
+
 COPY . .
-# لا يوجد أي build-arg للـAPI
+# مع تعطيل optimizeCss لن نحتاج lightningcss نهائياً
 RUN npm run build
 
-# 2) Runtime (standalone)
+# ===== Runtime (standalone) =====
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
-COPY --from=build /app/.next/standalone ./
-COPY --from=build /app/public ./public
-COPY --from=build /app/.next/static ./.next/static
+ENV HOSTNAME=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1
+
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/static ./.next/static
+
 EXPOSE 3000
-CMD ["node",".next/standalone/server.js"]
+CMD ["node", "server.js"]
